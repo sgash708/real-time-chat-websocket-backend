@@ -1,7 +1,14 @@
-package server
+package main
 
-import "log"
+import (
+	"fmt"
+	"net/http"
+	"os"
+)
 
 func main() {
-	log.Println("start")
+	port := fmt.Sprintf(":%v", os.Getenv("PORT"))
+	if err := http.ListenAndServe(port, nil); err != nil {
+		panic(err)
+	}
 }
