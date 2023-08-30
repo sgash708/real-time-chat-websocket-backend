@@ -11,6 +11,8 @@ services:
     working_dir: /app/server
     ports:
       - "1333:1333"
+    environment:
+      PORT: "1333"
     tty: true
     restart: always
     command: sh ./bin/api.sh
