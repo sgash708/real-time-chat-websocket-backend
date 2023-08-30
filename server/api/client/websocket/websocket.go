@@ -5,12 +5,17 @@ import (
 	"net/http"
 
 	"github.com/gorilla/websocket"
+	"github.com/sgash708/real-time-chat-websocket-backend/api/domain/model"
 )
 
-type Websocket struct{}
+type Websocket struct {
+	Hub *model.Hub
+}
 
-func NewWebsocket() *Websocket {
-	return &Websocket{}
+func NewWebsocket(hub *model.Hub) *Websocket {
+	return &Websocket{
+		Hub: hub,
+	}
 }
 
 func (wh *Websocket) Handle(w http.ResponseWriter, r *http.Request) {
@@ -19,7 +24,13 @@ func (wh *Websocket) Handle(w http.ResponseWriter, r *http.Request) {
 			return true
 		},
 	}
-	if _, err := upgrader.Upgrade(w, r, nil); err != nil {
+	ws, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
 		log.Fatal(err)
 	}
+
+	client := model.NewClient(ws)
+	go client.ReadLoop(wh.Hub.BroadcastCh, wh.Hub.UnRegisterCh)
+	go client.WriteLoop()
+	wh.Hub.RegisterCh <- client
 }

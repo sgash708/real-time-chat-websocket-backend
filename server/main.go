@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/sgash708/real-time-chat-websocket-backend/api/client/websocket"
+	"github.com/sgash708/real-time-chat-websocket-backend/api/domain/model"
 	"github.com/sgash708/real-time-chat-websocket-backend/api/handler"
 )
 
@@ -19,8 +20,12 @@ func main() {
 }
 
 func di() {
+	// Domain
+	hub := model.NewHub()
+	go hub.RunLoop()
+
 	// Client
-	webSocket := websocket.NewWebsocket()
+	webSocket := websocket.NewWebsocket(hub)
 
 	// Handler
 	h := handler.NewHandler(
